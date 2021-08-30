@@ -81,6 +81,35 @@ namespace WorkingTime.Functions.Functions
                     Message = $"The employee with the id: {IdEmployee}, was not found"
                 });
             }
+
+            WorkingEntity workingEntity = (WorkingEntity)findEmployeeResult.Result;
+
+            
+
+            if (string.IsNullOrEmpty(workingTable.Type.ToString()))
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    Message = "You must enter a type"
+                });
+            }
+
+            WorkingEntity working_Entity = new WorkingEntity
+            {
+                RegisterTime = workingTable.RegisterTime,
+                Type = workingTable.Type
+            };
+
+            TableOperation substituteOperation = TableOperation.Replace(working_Entity);
+            await workingTimeTable.ExecuteAsync(substituteOperation);
+
+            log.LogInformation($"Update a register in table, id:{IdEmployee}");
+
+            return new OkObjectResult(new Response
+            {
+                IdEmployee = workingEntity.IdEmployee,
+                Message = "Information successfully update"
+            });
         }
 
     }
