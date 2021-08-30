@@ -26,7 +26,7 @@ namespace WorkingTime.Functions.Functions
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             WorkingTable workingTable = JsonConvert.DeserializeObject<WorkingTable>(requestBody);
-            if(string.IsNullOrEmpty(workingTable?.IdEmployee.ToString()))
+            if (string.IsNullOrEmpty(workingTable?.IdEmployee.ToString()))
             {
                 return new BadRequestObjectResult(new Response
                 {
@@ -57,5 +57,31 @@ namespace WorkingTime.Functions.Functions
                 Message = "Information successfully recorded"
             });
         }
+
+        [FunctionName(nameof(UpdateWorking))]
+        public static async Task<IActionResult> UpdateWorking(
+           [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "workingTime/{IdEmployee}")] HttpRequest req,
+           [Table("workingTime", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable,
+           int IdEmployee,
+           ILogger log)
+        {
+            log.LogInformation($"Updating user registered: {IdEmployee}, in the table workingTime.");
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            WorkingTable workingTable = JsonConvert.DeserializeObject<WorkingTable>(requestBody);
+
+            TableOperation findOperation = TableOperation.Retrieve<WorkingEntity>("WORKINGTIME", IdEmployee.ToString());
+            TableResult findEmployeeResult = await workingTimeTable.ExecuteAsync(findOperation);
+
+            //Validate idEmployee, find
+            if (findEmployeeResult.Result == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    Message = $"The employee with the id: {IdEmployee}, was not found"
+                });
+            }
+        }
+
     }
 }
