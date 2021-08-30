@@ -109,5 +109,51 @@ namespace WorkingTime.Functions.Functions
             });
         }
 
+        [FunctionName(nameof(GetAllWorking))]
+        public static async Task<IActionResult> GetAllWorking(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "workingTime")] HttpRequest req,
+            [Table("workingTime", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable,
+            ILogger log)
+        {
+            log.LogInformation("All jobs recieved.");
+
+            TableQuery<WorkingEntity> query = new TableQuery<WorkingEntity>();
+            TableQuerySegment<WorkingEntity> workings = await workingTimeTable.ExecuteQuerySegmentedAsync(query, null);
+
+            log.LogInformation("Retrieved all workings");
+
+            return new OkObjectResult(new Response
+            {
+                Message = "Retrieved all workings",
+                Result = workings
+            });
+        }
+
+        [FunctionName(nameof(GetWorkingById))]
+        public static IActionResult GetWorkingById(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "workingTime/{IdEmployee}")] HttpRequest req,
+            [Table("workingTime","WORKINGTIME", "{IdEmployee}", Connection = "AzureWebJobsStorage")] WorkingEntity workingEntity,
+            string IdEmployee,
+            ILogger log)
+        {
+            log.LogInformation($"Get working by Id: {IdEmployee}, recieved.");
+
+            if (workingEntity == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    Message = "Working not found."
+                });
+            }
+
+            log.LogInformation($"Working: {IdEmployee}, retrieved.");
+
+            return new OkObjectResult(new Response
+            {
+                Message = "Retrieved all workings",
+                Result = IdEmployee
+            });
+        }
+
     }
 }

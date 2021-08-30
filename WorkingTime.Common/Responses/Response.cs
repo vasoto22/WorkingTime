@@ -9,5 +9,7 @@ namespace WorkingTime.Common.Responses
         public int IdEmployee { get; set; }
         public DateTime RegisteredTime { get; set; }
         public string Message { get; set; }
+
+        public object Result { get; set; }
     }
 }
