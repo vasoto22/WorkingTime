@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WorkingTime.Common.Models
 {
-    class WorkingTable
+    public class WorkingTable
     {
         public int IdEmployee { get; set; }
 
