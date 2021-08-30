@@ -62,7 +62,7 @@ namespace WorkingTime.Functions.Functions
         public static async Task<IActionResult> UpdateWorking(
            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "workingTime/{IdEmployee}")] HttpRequest req,
            [Table("workingTime", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable,
-           int IdEmployee,
+           string IdEmployee,
            ILogger log)
         {
             log.LogInformation($"Updating user registered: {IdEmployee}, in the table workingTime.");
@@ -70,7 +70,7 @@ namespace WorkingTime.Functions.Functions
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             WorkingTable workingTable = JsonConvert.DeserializeObject<WorkingTable>(requestBody);
 
-            TableOperation findOperation = TableOperation.Retrieve<WorkingEntity>("WORKINGTIME", IdEmployee.ToString());
+            TableOperation findOperation = TableOperation.Retrieve<WorkingEntity>("WORKINGTIME", IdEmployee);
             TableResult findEmployeeResult = await workingTimeTable.ExecuteAsync(findOperation);
 
             //Validate idEmployee, find
@@ -83,8 +83,11 @@ namespace WorkingTime.Functions.Functions
             }
 
             WorkingEntity workingEntity = (WorkingEntity)findEmployeeResult.Result;
+            workingEntity.RegisterTime = workingTable.RegisterTime;
+            workingEntity.Type = workingTable.Type;
 
-            
+
+
 
             if (string.IsNullOrEmpty(workingTable.Type.ToString()))
             {
@@ -94,13 +97,7 @@ namespace WorkingTime.Functions.Functions
                 });
             }
 
-            WorkingEntity working_Entity = new WorkingEntity
-            {
-                RegisterTime = workingTable.RegisterTime,
-                Type = workingTable.Type
-            };
-
-            TableOperation substituteOperation = TableOperation.Replace(working_Entity);
+            TableOperation substituteOperation = TableOperation.Replace(workingEntity);
             await workingTimeTable.ExecuteAsync(substituteOperation);
 
             log.LogInformation($"Update a register in table, id:{IdEmployee}");
