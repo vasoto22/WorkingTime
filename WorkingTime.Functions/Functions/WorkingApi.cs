@@ -146,14 +146,41 @@ namespace WorkingTime.Functions.Functions
                 });
             }
 
-            log.LogInformation($"Working: {IdEmployee}, retrieved.");
+            log.LogInformation($"Working: {workingEntity.RowKey}, retrieved.");
 
             return new OkObjectResult(new Response
             {
-                Message = "Retrieved all workings",
-                Result = IdEmployee
+                Message = "Retrieved working",
+                Result = workingEntity
             });
         }
 
+        [FunctionName(nameof(DeleteWorking))]
+        public static async Task<IActionResult> DeleteWorking(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "workingTime/{IdEmployee}")] HttpRequest req,
+            [Table("workingTime", "WORKINGTIME", "{IdEmployee}", Connection = "AzureWebJobsStorage")] WorkingEntity workingEntity,
+             [Table("workingTime", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable,
+            string IdEmployee,
+            ILogger log)
+        {
+            log.LogInformation($"Delete working: {IdEmployee}, recieved.");
+
+            if (workingEntity == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    Message = "Working not found."
+                });
+            }
+
+            await workingTimeTable.ExecuteAsync(TableOperation.Delete(workingEntity));
+            log.LogInformation($"Working: {workingEntity.RowKey}, deleted.");
+
+            return new OkObjectResult(new Response
+            {
+                Message = "Deleted working",
+                Result = workingEntity
+            });
+        }
     }
 }
