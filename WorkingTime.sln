@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkingTime.Common", "WorkingTime.Common\WorkingTime.Common.csproj", "{E5F90F2E-A9EA-4806-82B4-D32C410B5CC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkingTime.Common", "WorkingTime.Common\WorkingTime.Common.csproj", "{E5F90F2E-A9EA-4806-82B4-D32C410B5CC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkingTime.Functions", "WorkingTime.Functions\WorkingTime.Functions.csproj", "{54B138C2-41F5-4D95-8B42-14788D6A6016}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkingTime.Functions", "WorkingTime.Functions\WorkingTime.Functions.csproj", "{54B138C2-41F5-4D95-8B42-14788D6A6016}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkingTime.Test", "WorkingTime.Test\WorkingTime.Test.csproj", "{760B225E-9F5D-4626-B558-0625EF0862DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkingTime.Test", "WorkingTime.Test\WorkingTime.Test.csproj", "{760B225E-9F5D-4626-B558-0625EF0862DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
