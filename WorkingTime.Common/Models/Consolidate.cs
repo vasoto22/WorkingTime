@@ -8,7 +8,7 @@ namespace WorkingTime.Common.Models
     {
         public int IdEmployee { get; set; }
         public DateTime DateTime { get; set; }
-        public int MinuteTime { get; set; }
+        public double MinuteTime { get; set; }
 
     }
 }

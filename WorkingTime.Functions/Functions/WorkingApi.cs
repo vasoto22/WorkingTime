@@ -15,7 +15,7 @@ using WorkingTime.Functions.Entities;
 namespace WorkingTime.Functions.Functions
 {
     public static class WorkingApi
-    {
+    { 
         [FunctionName(nameof(CreateWorking))]
         public static async Task<IActionResult> CreateWorking(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "workingTime")] HttpRequest req,
@@ -180,6 +180,169 @@ namespace WorkingTime.Functions.Functions
             {
                 Message = "Deleted working",
                 Result = workingEntity
+            });
+        }
+
+        /*[FunctionName(nameof(WorkingTest))]
+        public static async Task<IActionResult> WorkingTest(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "TestWorking")] HttpRequest req,
+            [Table("workingTime", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable,
+            ILogger log)
+        {
+            log.LogInformation($"Prepare to consolidate all registers. Time: {DateTime.Now}");
+
+            // CheckEntity = Tabla 1
+            string filter = TableQuery.GenerateFilterConditionForBool("Consolidated", QueryComparisons.Equal, false);
+            TableQuery<WorkingEntity> query = new TableQuery<WorkingEntity>().Where(filter);
+            TableQuerySegment<WorkingEntity> allCheckEntity = await workingTimeTable.ExecuteQuerySegmentedAsync(query, null);
+
+
+            //CheckConsolidateEntity = Tabla 2
+            TableQuery<ConsolidateEntity> queryConsolidate = new TableQuery<ConsolidateEntity>();
+            TableQuerySegment<ConsolidateEntity> allCheckConsolidateEntity = await workingTimeTable.ExecuteQuerySegmentedAsync(queryConsolidate, null);
+
+            if (allCheckEntity == null)
+            {
+                return new BadRequestObjectResult(new ResponseConsolidate
+                {
+                    Message = "Object null"
+                });
+            }
+
+            log.LogInformation("Entrando al primer foreach");
+
+            foreach (WorkingEntity item in allCheckEntity) //1
+            {
+                if (item.Type == 0)
+                {
+                    log.LogInformation("Entrando al segundo foreach");
+                    foreach (WorkingEntity itemTwo in allCheckEntity)
+                    {
+                        log.LogInformation("validado if");
+                        if (item.IdEmployee == itemTwo.IdEmployee && itemTwo.Type == 1)
+                        {
+                            TimeSpan dateCalculated = (itemTwo.RegisterTime - item.RegisterTime);
+
+                            WorkingEntity check = new WorkingEntity
+                            {
+                                Consolidated = true,
+                                PartitionKey = "WORKINGTIME",
+                                RowKey = item.RowKey,
+                                ETag = "*"
+                            };
+                            log.LogInformation($"Este es el IDRowKey, {item.RowKey}");
+
+                            TableOperation updateCheckEntity = TableOperation.Replace(check);
+                            await workingTimeTable.ExecuteAsync(updateCheckEntity);
+
+                            
+
+                            foreach (ConsolidateEntity itemConsolidate in allCheckConsolidateEntity)
+                            {
+                                log.LogInformation("Actualizando consolidado segunda tabla");
+                                if (itemConsolidate.IdEmployee == item.IdEmployee)
+                                {
+                                    ConsolidateEntity checkConsolidate = new ConsolidateEntity
+                                    {
+                                        IdEmployee = itemConsolidate.IdEmployee,
+                                        DateTime = itemConsolidate.DateTime,
+                                        MinuteTime = itemConsolidate.MinuteTime + dateCalculated.TotalMinutes
+                                    };
+
+                                    TableOperation insertCheckConsolidate = TableOperation.Replace(checkConsolidate);
+                                    await workingTimeTable.ExecuteAsync(insertCheckConsolidate);
+                                }
+                                else
+                                {
+                                    ConsolidateEntity checkConsolidate = new ConsolidateEntity
+                                    {
+                                        IdEmployee = item.IdEmployee,
+                                        DateTime = item.RegisterTime,
+                                        MinuteTime = dateCalculated.TotalMinutes
+                                    };
+
+                                    TableOperation insertCheckConsolidate = TableOperation.Insert(checkConsolidate);
+                                    await workingTimeTable.ExecuteAsync(insertCheckConsolidate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }*/
+        [FunctionName(nameof(Test))]
+        public static async Task<IActionResult> Test(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Tests")] HttpRequest req,
+            [Table("workingTime", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable,
+            ILogger log)
+        {
+            log.LogInformation($"Prepare to consolidate all registers. Time: {DateTime.Now}");
+
+            // CheckEntity = Tabla 1
+            string filter = TableQuery.GenerateFilterConditionForBool("Consolidated", QueryComparisons.Equal, false);
+            TableQuery<WorkingEntity> query = new TableQuery<WorkingEntity>().Where(filter);
+            TableQuerySegment<WorkingEntity> allCheckEntity = await workingTimeTable.ExecuteQuerySegmentedAsync(query, null);
+
+            //CheckConsolidateEntity = Tabla 2
+            TableQuery<ConsolidateEntity> queryConsolidate = new TableQuery<ConsolidateEntity>();
+            TableQuerySegment<ConsolidateEntity> allCheckConsolidateEntity = await workingTimeTable.ExecuteQuerySegmentedAsync(queryConsolidate, null);
+
+            bool correctUpdate = false;
+
+            foreach (WorkingEntity item in allCheckEntity)
+            {
+                if (!string.IsNullOrEmpty(item.IdEmployee.ToString()) && item.Type == 0)
+                {
+                    foreach (WorkingEntity itemtwo in allCheckEntity)
+                    {
+                        TimeSpan dateCalculated = (itemtwo.RegisterTime - item.RegisterTime);
+                        
+                        if (itemtwo.IdEmployee.Equals(item.IdEmployee) && itemtwo.Type == 1)  
+                        {
+                            log.LogInformation($"Este es el IDRowKey, {item.RowKey}");
+                            log.LogInformation($"Este es el cálculo, {dateCalculated}");
+
+                            WorkingEntity check = new WorkingEntity
+                            {   
+                                IdEmployee = itemtwo.IdEmployee,
+                                RegisterTime = Convert.ToDateTime(dateCalculated.ToString()),
+                                Type = itemtwo.Type,
+                                Consolidated = true,
+                                PartitionKey = "WORKINGTIME",
+                                RowKey = itemtwo.RowKey,
+                                ETag = "*"
+                            };
+                            
+
+                            TableOperation updateCheckEntity = TableOperation.Replace(check);
+                            await workingTimeTable.ExecuteAsync(updateCheckEntity);
+                            correctUpdate = true;
+                        }
+
+                        log.LogInformation($"He estado aquí, {item.RowKey}");
+                        if (correctUpdate == true)
+                        {
+                            WorkingEntity check = new WorkingEntity
+                            {
+                                IdEmployee = item.IdEmployee,
+                                RegisterTime = Convert.ToDateTime(dateCalculated.ToString()),
+                                Type = item.Type,
+                                Consolidated = true,
+                                PartitionKey = "WORKINGTIME",
+                                RowKey = item.RowKey,
+                                ETag = "*"
+                            };
+                            TableOperation updateCheckEntity = TableOperation.Replace(check);
+                            await workingTimeTable.ExecuteAsync(updateCheckEntity);
+                        }
+                    }
+                }
+            }
+
+
+            return new OkObjectResult(new ResponseConsolidate
+            {
+                Message = "Table",
+                Result = allCheckEntity
             });
         }
     }
