@@ -1,13 +1,13 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using WorkingTime.Common.Models;
 using WorkingTime.Common.Responses;
 using WorkingTime.Functions.Entities;
@@ -15,7 +15,7 @@ using WorkingTime.Functions.Entities;
 namespace WorkingTime.Functions.Functions
 {
     public static class WorkingApi
-    { 
+    {
         [FunctionName(nameof(CreateWorking))]
         public static async Task<IActionResult> CreateWorking(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "workingTime")] HttpRequest req,
@@ -132,7 +132,7 @@ namespace WorkingTime.Functions.Functions
         [FunctionName(nameof(GetWorkingById))]
         public static IActionResult GetWorkingById(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "workingTime/{IdEmployee}")] HttpRequest req,
-            [Table("workingTime","WORKINGTIME", "{IdEmployee}", Connection = "AzureWebJobsStorage")] WorkingEntity workingEntity,
+            [Table("workingTime", "WORKINGTIME", "{IdEmployee}", Connection = "AzureWebJobsStorage")] WorkingEntity workingEntity,
             string IdEmployee,
             ILogger log)
         {
@@ -269,7 +269,7 @@ namespace WorkingTime.Functions.Functions
                     }
                 }
             }*/
-        [FunctionName(nameof(Test))]
+        /*[FunctionName(nameof(Test))]
         public static async Task<IActionResult> Test(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Tests")] HttpRequest req,
             [Table("workingTime", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable,
@@ -343,7 +343,7 @@ namespace WorkingTime.Functions.Functions
             {
                 Message = "Table",
                 Result = allCheckEntity
-            });
-        }
+            });*/
+        //}
     }
 }
