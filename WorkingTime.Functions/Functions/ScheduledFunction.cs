@@ -96,8 +96,9 @@ namespace WorkingTime.Functions.Functions
                 foreach (ConsolidateEntity itemConsolidate in consolidateEntity)
                 {
                     //log.LogInformation("Actualizando consolidado segunda tabla");
-                    if (itemConsolidate.IdEmployee == dateTwo.IdEmployee)
+                    if (itemConsolidate.IdEmployee == date.IdEmployee)
                     {
+                        
                         ConsolidateEntity checkConsolidateFor = new ConsolidateEntity
                         {
                             IdEmployee = itemConsolidate.IdEmployee,
