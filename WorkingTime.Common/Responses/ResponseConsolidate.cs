@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WorkingTime.Common.Responses
+﻿namespace WorkingTime.Common.Responses
 {
     public class ResponseConsolidate
     {

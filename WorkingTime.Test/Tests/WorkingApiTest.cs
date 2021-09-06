@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using WorkingTime.Common.Models;
 using WorkingTime.Functions.Entities;
 using WorkingTime.Functions.Functions;
@@ -72,7 +70,8 @@ namespace WorkingTime.Test.Tests
             OkObjectResult result = (OkObjectResult)response;
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
         }
-         [Fact]
+
+        [Fact]
 
         public void GetWorkingById_Should_Return_200()
         {
@@ -93,15 +92,12 @@ namespace WorkingTime.Test.Tests
         }
 
 
-
-
-
-       /* [Fact]
+        /*[Fact]
         public async void GetAllWorking_Should_Return_200()
         {
             //Arrenge
             MockCloudTableWorking mockCloudTableWorking = new MockCloudTableWorking(new Uri("http://127.0.0.1:10002/devstoreaccount1/reports"));
-            //WorkingTable workingRequest = TestFactory.getWorkingRequest();
+            WorkingTable workingRequest = TestFactory.getWorkingRequest();
             DefaultHttpRequest request = TestFactory.CreateHttpRequest();
 
             //Act

@@ -206,11 +206,11 @@ namespace WorkingTime.Functions.Functions
             {
                 return new OkObjectResult(new ResponseConsolidate
                 {
-                    Message = $"Get all registers from consolidate. Date:{Date}",
+                    Message = $"Get the register from consolidate. Date:{Date}",
                     Result = allCheckConsolidateEntity
                 });
             }
         }
 
-        }
+    }
 }

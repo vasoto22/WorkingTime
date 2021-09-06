@@ -8,8 +8,9 @@ namespace WorkingTime.Functions.Functions.functionHelper
 
     public class EmployInformation
     {
-    
-        public static WorkingEntity saveEmployInformation(WorkingEntity employData) {
+        //Method for storing employee information when you already have an in and out
+        public static WorkingEntity saveEmployInformation(WorkingEntity employData)
+        {
             WorkingEntity working = new WorkingEntity
             {
                 IdEmployee = employData.IdEmployee,
@@ -20,14 +21,14 @@ namespace WorkingTime.Functions.Functions.functionHelper
                 RowKey = employData.RowKey,
                 ETag = "*"
             };
-            
+
             return working;
         }
 
-        
-         public static ConsolidateEntity saveConsolidatedUserInformation(ConsolidateEntity employConsolidate,
-         TimeSpan dateCalculated)
-          {
+        //Method for storing consolidated employee information
+        public static ConsolidateEntity saveConsolidatedUserInformation(ConsolidateEntity employConsolidate,
+        TimeSpan dateCalculated)
+        {
             ConsolidateEntity consolidate = new ConsolidateEntity
             {
                 IdEmployee = employConsolidate.IdEmployee,
@@ -39,10 +40,12 @@ namespace WorkingTime.Functions.Functions.functionHelper
             };
 
             return consolidate;
-         }
+        }
 
+        //Method to create consolidated employee information if you find no record in the table
         public static ConsolidateEntity createConsolidatedUserInformation(WorkingEntity employConsolidate,
-        TimeSpan dateCalculated) {
+        TimeSpan dateCalculated)
+        {
             ConsolidateEntity consolidate = new ConsolidateEntity
             {
                 IdEmployee = employConsolidate.IdEmployee,
@@ -54,16 +57,16 @@ namespace WorkingTime.Functions.Functions.functionHelper
             };
 
             return consolidate;
-         }
+        }
 
-         
-        public static async Task collectConsolidateDates(TableQuerySegment<ConsolidateEntity> consolidateEntity, 
+        //validation of duplicates in the main table and called methods that store as condition is met
+        public static async Task collectConsolidateDates(TableQuerySegment<ConsolidateEntity> consolidateEntity,
         WorkingEntity date, WorkingEntity dateTwo, TimeSpan dateCalculated, CloudTable workingTimeTable2)
         {
             if (consolidateEntity.Results.Count == 0)
             {
                 TableOperation insertConsolidate = TableOperation.Insert(EmployInformation
-                    .createConsolidatedUserInformation(date,dateCalculated));
+                    .createConsolidatedUserInformation(date, dateCalculated));
                 await workingTimeTable2.ExecuteAsync(insertConsolidate);
             }
             else
@@ -73,13 +76,13 @@ namespace WorkingTime.Functions.Functions.functionHelper
                     if (itemConsol.IdEmployee == date.IdEmployee)
                     {
                         TableOperation insertConsolidate = TableOperation.Insert(EmployInformation
-                        .saveConsolidatedUserInformation(itemConsol,dateCalculated));
+                        .saveConsolidatedUserInformation(itemConsol, dateCalculated));
                         await workingTimeTable2.ExecuteAsync(insertConsolidate);
                     }
                     else
                     {
                         TableOperation insertConsolidate = TableOperation.Insert(EmployInformation
-                            .createConsolidatedUserInformation(date,dateCalculated));
+                            .createConsolidatedUserInformation(date, dateCalculated));
                         await workingTimeTable2.ExecuteAsync(insertConsolidate);
                     }
                 }

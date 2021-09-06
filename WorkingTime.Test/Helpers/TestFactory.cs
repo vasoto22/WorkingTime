@@ -4,9 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using WorkingTime.Common.Models;
 using WorkingTime.Functions.Entities;
 
@@ -81,7 +79,7 @@ namespace WorkingTime.Test.Helpers
         public static ILogger CreateLogger(LoggerTypes type = LoggerTypes.Null)
         {
             ILogger logger;
-            if (type ==LoggerTypes.List)
+            if (type == LoggerTypes.List)
             {
                 logger = new ListLogger();
             }

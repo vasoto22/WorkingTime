@@ -27,11 +27,8 @@ namespace WorkingTime.Functions.Functions
             TableQuerySegment<ConsolidateEntity> allConsolidateEntity = await workingTimeTable2
                 .ExecuteQuerySegmentedAsync(queryConsolidate, null);
 
-
-            log.LogInformation($"Entrando al primer foreach");
             foreach (WorkingEntity date in allEntity)
             {
-                log.LogInformation($"Este es el primer if");
                 if (!string.IsNullOrEmpty(date.IdEmployee.ToString()) && date.Type == 0)
                 {
                     foreach (WorkingEntity datetwo in allEntity)
@@ -47,12 +44,13 @@ namespace WorkingTime.Functions.Functions
                             TableOperation updateOtherWorking = TableOperation.Replace(EmployInformation
                                 .saveEmployInformation(date));
                             await workingTimeTable.ExecuteAsync(updateOtherWorking);
-                            await EmployInformation.collectConsolidateDates(allConsolidateEntity, date, datetwo, 
-                                dateCalculated,workingTimeTable2);
+                            await EmployInformation.collectConsolidateDates(allConsolidateEntity, date, datetwo,
+                                dateCalculated, workingTimeTable2);
                         }
                     }
                 }
             }
+            log.LogInformation("Employee information was successfully consolidated.");
         }
     }
 }
