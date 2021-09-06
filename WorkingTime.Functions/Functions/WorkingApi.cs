@@ -182,5 +182,35 @@ namespace WorkingTime.Functions.Functions
                 Result = workingEntity
             });
         }
-    }
+
+        [FunctionName(nameof(GetConsolidated))]
+        public static async Task<IActionResult> GetConsolidated(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "workingTime/{Date}")] HttpRequest req,
+            [Table("workingConsolidated", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable2,
+            DateTime Date,
+            ILogger log)
+        {
+            log.LogInformation("Recieved a new register");
+            string filter = TableQuery.GenerateFilterConditionForDate("DateClient", QueryComparisons.Equal, Date);
+            TableQuery<ConsolidateEntity> query = new TableQuery<ConsolidateEntity>().Where(filter);
+            TableQuerySegment<ConsolidateEntity> allCheckConsolidateEntity = await workingTimeTable2.ExecuteQuerySegmentedAsync(query, null);
+
+            if (allCheckConsolidateEntity == null || allCheckConsolidateEntity.Results.Count.Equals(0))
+            {
+                return new OkObjectResult(new ResponseConsolidate
+                {
+                    Message = "Date not found.",
+                });
+            }
+            else
+            {
+                return new OkObjectResult(new ResponseConsolidate
+                {
+                    Message = $"Get all registers from consolidate. Date:{Date}",
+                    Result = allCheckConsolidateEntity
+                });
+            }
+        }
+
+        }
 }

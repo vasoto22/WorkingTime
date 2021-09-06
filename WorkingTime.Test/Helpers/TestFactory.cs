@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,7 @@ namespace WorkingTime.Test.Helpers
                 ETag = "*",
                 PartitionKey = "WORKINGTIME",
                 RowKey = Guid.NewGuid().ToString(),
-                IdEmployee = 123,
+                IdEmployee = 1,
                 RegisterTime = DateTime.UtcNow,
                 Type = 0,
                 Consolidated = false
@@ -52,9 +54,42 @@ namespace WorkingTime.Test.Helpers
                 Body = GenerateStreamFromString(request),
             };
         }
-        private static Stream GenerateStreamFromString(string request)
+
+        public static DefaultHttpRequest CreateHttpRequest()
         {
-            throw new NotImplementedException();
+            return new DefaultHttpRequest(new DefaultHttpContext());
+        }
+
+        public static WorkingTable getWorkingRequest()
+        {
+            return new WorkingTable
+            {
+                IdEmployee = 1,
+                Type = 0,
+            };
+        }
+        public static Stream GenerateStreamFromString(string stringToConvert)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(stringToConvert);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+
+        public static ILogger CreateLogger(LoggerTypes type = LoggerTypes.Null)
+        {
+            ILogger logger;
+            if (type ==LoggerTypes.List)
+            {
+                logger = new ListLogger();
+            }
+            else
+            {
+                logger = NullLoggerFactory.Instance.CreateLogger("Null Logger");
+            }
+            return logger;
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Threading.Tasks;
 using WorkingTime.Functions.Entities;
+using WorkingTime.Functions.Functions.functionHelper;
 
 namespace WorkingTime.Functions.Functions
 {
@@ -38,31 +39,12 @@ namespace WorkingTime.Functions.Functions
 
                         if (datetwo.IdEmployee.Equals(date.IdEmployee) && datetwo.Type == 1)
                         {
-
-                            WorkingEntity working = new WorkingEntity
-                            {
-                                IdEmployee = datetwo.IdEmployee,
-                                RegisterTime = datetwo.RegisterTime,
-                                Type = datetwo.Type,
-                                Consolidated = true,
-                                PartitionKey = "WORKINGTIME",
-                                RowKey = datetwo.RowKey,
-                                ETag = "*"
-                            };
-                            WorkingEntity otherWorking = new WorkingEntity
-                            {
-                                IdEmployee = date.IdEmployee,
-                                RegisterTime = date.RegisterTime,
-                                Type = date.Type,
-                                Consolidated = true,
-                                PartitionKey = "WORKINGTIME",
-                                RowKey = date.RowKey,
-                                ETag = "*"
-                            };
-                            TableOperation updateWorking = TableOperation.Replace(working);
+                            TableOperation updateWorking = TableOperation.Replace(EmployInformation.saveEmployInformation(datetwo));
+                            //TableOperation updateWorking = TableOperation.Replace(working);
                             await workingTimeTable.ExecuteAsync(updateWorking);
 
-                            TableOperation updateOtherWorking = TableOperation.Replace(otherWorking);
+                            //TableOperation updateOtherWorking = TableOperation.Replace(otherWorking);
+                            TableOperation updateOtherWorking = TableOperation.Replace(EmployInformation.saveEmployInformation(date));
                             await workingTimeTable.ExecuteAsync(updateOtherWorking);
                             await el_chocolero(allConsolidateEntity, date, datetwo, dateCalculated,workingTimeTable2);
                         }
@@ -71,7 +53,8 @@ namespace WorkingTime.Functions.Functions
             }
         }
 
-        public static async Task el_chocolero(TableQuerySegment<ConsolidateEntity> consolidateEntity, WorkingEntity date, WorkingEntity dateTwo, TimeSpan dateCalculated, CloudTable workingTimeTable2)
+        public static async Task el_chocolero(TableQuerySegment<ConsolidateEntity> consolidateEntity, 
+        WorkingEntity date, WorkingEntity dateTwo, TimeSpan dateCalculated, CloudTable workingTimeTable2)
         {
             if (consolidateEntity.Results.Count == 0)
             {
@@ -129,3 +112,26 @@ namespace WorkingTime.Functions.Functions
         }
     }
 }
+
+/**
+                            WorkingEntity working = new WorkingEntity
+                            {
+                                IdEmployee = datetwo.IdEmployee,
+                                RegisterTime = datetwo.RegisterTime,
+                                Type = datetwo.Type,
+                                Consolidated = true,
+                                PartitionKey = "WORKINGTIME",
+                                RowKey = datetwo.RowKey,
+                                ETag = "*"
+                            };
+                            WorkingEntity otherWorking = new WorkingEntity
+                            {
+                                IdEmployee = date.IdEmployee,
+                                RegisterTime = date.RegisterTime,
+                                Type = date.Type,
+                                Consolidated = true,
+                                PartitionKey = "WORKINGTIME",
+                                RowKey = date.RowKey,
+                                ETag = "*"
+                            };
+**/
