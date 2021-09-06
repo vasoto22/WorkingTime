@@ -78,7 +78,7 @@ namespace WorkingTime.Functions.Functions
         {
             if (consolidateEntity.Results.Count == 0)
             {
-                ConsolidateEntity checkConsolidate = new ConsolidateEntity
+                ConsolidateEntity validateConsolidate = new ConsolidateEntity
                 {
                     IdEmployee = date.IdEmployee,
                     DateTime = date.RegisterTime,
@@ -88,33 +88,33 @@ namespace WorkingTime.Functions.Functions
                     ETag = "*"
                 };
 
-                TableOperation insertCheckConsolidate = TableOperation.Insert(checkConsolidate);
-                await workingTimeTable2.ExecuteAsync(insertCheckConsolidate);
+                TableOperation insertValidateConsolidate = TableOperation.Insert(validateConsolidate);
+                await workingTimeTable2.ExecuteAsync(insertValidateConsolidate);
             }
             else
             {
-                foreach (ConsolidateEntity itemConsolidate in consolidateEntity)
+                foreach (ConsolidateEntity itemConsol in consolidateEntity)
                 {
                     //log.LogInformation("Actualizando consolidado segunda tabla");
-                    if (itemConsolidate.IdEmployee == date.IdEmployee)
+                    if (itemConsol.IdEmployee == date.IdEmployee)
                     {
                         
-                        ConsolidateEntity checkConsolidateFor = new ConsolidateEntity
+                        ConsolidateEntity validateConsolidateTwo = new ConsolidateEntity
                         {
-                            IdEmployee = itemConsolidate.IdEmployee,
-                            DateTime = itemConsolidate.DateTime,
-                            MinuteTime = (double)(itemConsolidate.MinuteTime + dateCalculated.TotalMinutes),
-                            PartitionKey = itemConsolidate.PartitionKey,
-                            RowKey = itemConsolidate.RowKey,
+                            IdEmployee = itemConsol.IdEmployee,
+                            DateTime = itemConsol.DateTime,
+                            MinuteTime = (double)(itemConsol.MinuteTime + dateCalculated.TotalMinutes),
+                            PartitionKey = itemConsol.PartitionKey,
+                            RowKey = itemConsol.RowKey,
                             ETag = "*"
                         };
 
-                        TableOperation insertConsolidate = TableOperation.Replace(checkConsolidateFor);
+                        TableOperation insertConsolidate = TableOperation.Replace(validateConsolidateTwo);
                         await workingTimeTable2.ExecuteAsync(insertConsolidate);
                     }
                     else
                     {
-                        ConsolidateEntity checkConsolidateFor = new ConsolidateEntity
+                        ConsolidateEntity validateConsolidateTwo = new ConsolidateEntity
                         {
                             IdEmployee = date.IdEmployee,
                             DateTime = date.RegisterTime,
@@ -124,7 +124,7 @@ namespace WorkingTime.Functions.Functions
                             ETag = "*"
                         };
 
-                        TableOperation insertConsolidate = TableOperation.Insert(checkConsolidateFor);
+                        TableOperation insertConsolidate = TableOperation.Insert(validateConsolidateTwo);
                         await workingTimeTable2.ExecuteAsync(insertConsolidate);
                     }
                 }
