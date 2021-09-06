@@ -185,13 +185,13 @@ namespace WorkingTime.Functions.Functions
 
         [FunctionName(nameof(GetConsolidated))]
         public static async Task<IActionResult> GetConsolidated(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "workingTime/{Date}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "workingConsolidated/{Date}")] HttpRequest req,
             [Table("workingConsolidated", Connection = "AzureWebJobsStorage")] CloudTable workingTimeTable2,
             DateTime Date,
             ILogger log)
         {
             log.LogInformation("Recieved a new register");
-            string filter = TableQuery.GenerateFilterConditionForDate("DateClient", QueryComparisons.Equal, Date);
+            string filter = TableQuery.GenerateFilterConditionForDate("DateTime", QueryComparisons.Equal, Date);
             TableQuery<ConsolidateEntity> query = new TableQuery<ConsolidateEntity>().Where(filter);
             TableQuerySegment<ConsolidateEntity> allCheckConsolidateEntity = await workingTimeTable2.ExecuteQuerySegmentedAsync(query, null);
 

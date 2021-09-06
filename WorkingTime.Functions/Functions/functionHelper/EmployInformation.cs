@@ -1,4 +1,6 @@
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Threading.Tasks;
 using WorkingTime.Functions.Entities;
 
 namespace WorkingTime.Functions.Functions.functionHelper
@@ -21,19 +23,67 @@ namespace WorkingTime.Functions.Functions.functionHelper
             
             return working;
         }
-        /*
-        public static ConsolidateEntity saveConsolidatedEmployInformation(ConsolidateEntity employData) {
-            ConsolidateEntity validateConsolidate = new ConsolidateEntity
+
+        
+         public static ConsolidateEntity saveConsolidatedUserInformation(ConsolidateEntity employConsolidate,
+         TimeSpan dateCalculated)
+          {
+            ConsolidateEntity consolidate = new ConsolidateEntity
             {
-                IdEmployee = employData.IdEmployee,
-                DateTime = employData.RegisterTime,
-                MinuteTime = employData.TotalMinutes,
+                IdEmployee = employConsolidate.IdEmployee,
+                DateTime = employConsolidate.DateTime,
+                MinuteTime = (double)(employConsolidate.MinuteTime + dateCalculated.TotalMinutes),
+                PartitionKey = employConsolidate.PartitionKey,
+                RowKey = employConsolidate.RowKey,
+                ETag = "*"
+            };
+
+            return consolidate;
+         }
+
+        public static ConsolidateEntity createConsolidatedUserInformation(WorkingEntity employConsolidate,
+        TimeSpan dateCalculated) {
+            ConsolidateEntity consolidate = new ConsolidateEntity
+            {
+                IdEmployee = employConsolidate.IdEmployee,
+                DateTime = employConsolidate.RegisterTime,
+                MinuteTime = dateCalculated.TotalMinutes,
                 PartitionKey = "WORKINGCONSOLIDATED",
                 RowKey = Guid.NewGuid().ToString(),
                 ETag = "*"
             };
 
-            return validateConsolidate;
-        }*/
+            return consolidate;
+         }
+
+         
+        public static async Task collectConsolidateDates(TableQuerySegment<ConsolidateEntity> consolidateEntity, 
+        WorkingEntity date, WorkingEntity dateTwo, TimeSpan dateCalculated, CloudTable workingTimeTable2)
+        {
+            if (consolidateEntity.Results.Count == 0)
+            {
+                TableOperation insertConsolidate = TableOperation.Insert(EmployInformation
+                    .createConsolidatedUserInformation(date,dateCalculated));
+                await workingTimeTable2.ExecuteAsync(insertConsolidate);
+            }
+            else
+            {
+                foreach (ConsolidateEntity itemConsol in consolidateEntity)
+                {
+                    if (itemConsol.IdEmployee == date.IdEmployee)
+                    {
+                        TableOperation insertConsolidate = TableOperation.Insert(EmployInformation
+                        .saveConsolidatedUserInformation(itemConsol,dateCalculated));
+                        await workingTimeTable2.ExecuteAsync(insertConsolidate);
+                    }
+                    else
+                    {
+                        TableOperation insertConsolidate = TableOperation.Insert(EmployInformation
+                            .createConsolidatedUserInformation(date,dateCalculated));
+                        await workingTimeTable2.ExecuteAsync(insertConsolidate);
+                    }
+                }
+            }
+        }
     }
 }
