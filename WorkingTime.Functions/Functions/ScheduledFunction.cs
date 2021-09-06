@@ -32,14 +32,12 @@ namespace WorkingTime.Functions.Functions
                 log.LogInformation($"Este es el primer if");
                 if (!string.IsNullOrEmpty(date.IdEmployee.ToString()) && date.Type == 0)
                 {
-                    log.LogInformation($"Este es el PRIMER IF foreach");
                     foreach (WorkingEntity datetwo in allEntity)
                     {
                         TimeSpan dateCalculated = (datetwo.RegisterTime - date.RegisterTime);
-                        log.LogInformation($"Este es el SEGUNDO foreach");
+
                         if (datetwo.IdEmployee.Equals(date.IdEmployee) && datetwo.Type == 1)
                         {
-                            log.LogInformation($"Este es el IDRowKey, {date.RowKey}, {datetwo.RowKey}");
 
                             WorkingEntity working = new WorkingEntity
                             {
@@ -66,7 +64,6 @@ namespace WorkingTime.Functions.Functions
 
                             TableOperation updateOtherWorking = TableOperation.Replace(otherWorking);
                             await workingTimeTable.ExecuteAsync(updateOtherWorking);
-                            log.LogInformation($"Este es el SALI DEL SEGUNDO FOR EACH foreach");
                             await el_chocolero(allConsolidateEntity, date, datetwo, dateCalculated,workingTimeTable2);
                         }
                     }
